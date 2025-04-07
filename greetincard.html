@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Greeting Card</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+    
+    .card {
+      position: relative;
+      width: 300px;
+      height: 400px;
+      transform-style: preserve-3d;
+      perspective: 1500px;
+      cursor: pointer;
+    }
+    
+    .card-front, .card-inside {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      transition: transform 1s ease;
+      overflow: hidden;
+    }
+    
+    .card-front {
+      background: linear-gradient(45deg, #89f7fe, #66a6ff);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform-origin: left;
+      z-index: 2;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .card-inside {
+      background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      transform: rotateY(0deg);
+    }
+    
+    .card.opened .card-front {
+      transform: rotateY(-180deg);
+    }
+    
+    .card-title {
+      font-size: 24px;
+      color: #ffffff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      z-index: 5;
+    }
+    
+    .card-message {
+      font-size: 16px;
+      color: #444;
+      line-height: 1.5;
+      max-width: 250px;
+      text-align: center;
+      z-index: 5;
+    }
+    
+    .image-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 15px 0;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .svg-image {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s ease;
+    }
+    
+    .image-container:hover .svg-image {
+      transform: scale(1.1);
+    }
+    
+    .heart {
+      color: red;
+      font-size: 60px;
+      position: relative;
+      animation: heartBeat 1.5s infinite;
+      z-index: 5;
+    }
+    
+    .star {
+      position: absolute;
+      background-color: #FFD700;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      z-index: 1;
+    }
+    
+    .butterfly {
+      position: absolute;
+      width: 40px;
+      height: 30px;
+      z-index: 2;
+    }
+    
+    .butterfly:before, .butterfly:after {
+      content: "";
+      position: absolute;
+      width: 15px;
+      height: 20px;
+      background: rgba(255, 105, 180, 0.7);
+      border-radius: 50% 50% 0 50%;
+    }
+    
+    .butterfly:after {
+      left: 15px;
+      transform: rotateY(180deg);
+    }
+    
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: transparent;
+      opacity: 0;
+      transform: rotate(0deg);
+      z-index: 10;
+    }
+    
+    .balloon {
+      position: absolute;
+      width: 40px;
+      height: 50px;
+      border-radius: 50%;
+      animation: float 5s infinite ease-in-out;
+      z-index: 1;
+    }
+    
+    .balloon:after {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.2);
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 20px;
+      animation: drift 15s infinite linear;
+      opacity: 0.7;
+      z-index: 1;
+    }
+    
+    .cloud:before, .cloud:after {
+      content: "";
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+    
+    .cloud:before {
+      width: 25px;
+      height: 25px;
+      top: -10px;
+      left: 5px;
+    }
+    
+    .cloud:after {
+      width: 20px;
+      height: 20px;
+      top: -8px;
+      right: 5px;
+    }
+    
+    @keyframes heartBeat {
+      0% {
+        transform: scale(1);
+      }
+      14% {
+        transform: scale(1.3);
+      }
+      28% {
+        transform: scale(1);
+      }
+      42% {
+        transform: scale(1.3);
+      }
+      70% {
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+    }
+    
+    @keyframes drift {
+      0% {
+        transform: translateX(-100px);
+      }
+      100% {
+        transform: translateX(400px);
+      }
+    }
+    
+    @keyframes confettiFall {
+      0% {
+        opacity: 1;
+        transform: translateY(-50px) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(300px) rotate(360deg);
+      }
+    }
+    
+    .click-instruction {
+      position: absolute;
+      bottom: 15px;
+      color: rgba(255, 255, 255, 0.8);
+      animation: pulse 2s infinite;
+      font-size: 14px;
+      z-index: 5;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    
+    .rainbow {
+      position: absolute;
+      width: 150px;
+      height: 75px;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 0, 0, 0.7),
+        rgba(255, 165, 0, 0.7),
+        rgba(255, 255, 0, 0.7),
+        rgba(0, 128, 0, 0.7),
+        rgba(0, 0, 255, 0.7),
+        rgba(75, 0, 130, 0.7),
+        rgba(238, 130, 238, 0.7)
+      );
+      border-radius: 75px 75px 0 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.5;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="card-front">
+      <div class="rainbow"></div>
+      <h1 class="card-title">Celebration of Life</h1>
+      <div class="image-container">
+        <svg class="svg-image" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sky -->
+          <rect width="200" height="150" fill="#87CEEB" />
+          
+          <!-- Sun -->
+          <circle cx="150" cy="40" r="20" fill="#FFD700">
+            <animate attributeName="r" values="20;22;20" dur="2s" repeatCount="indefinite" />
+          </circle>
+          
+          <!-- Sun rays -->
+          <g>
+            <line x1="150" y1="10" x2="150" y2="0" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="y2" values="0;5;0" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="150" y1="70" x2="150" y2="80" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="y2" values="80;75;80" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="120" y1="40" x2="110" y2="40" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="110;115;110" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="180" y1="40" x2="190" y2="40" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="190;185;190" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="130" y1="20" x2="120" y2="10" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="120;125;120" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="y2" values="10;15;10" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="170" y1="20" x2="180" y2="10" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="180;175;180" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="y2" values="10;15;10" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="130" y1="60" x2="120" y2="70" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="120;125;120" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="y2" values="70;65;70" dur="3s" repeatCount="indefinite" />
+            </line>
+            <line x1="170" y1="60" x2="180" y2="70" stroke="#FFD700" stroke-width="2">
+              <animate attributeName="x2" values="180;175;180" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="y2" values="70;65;70" dur="3s" repeatCount="indefinite" />
+            </line>
+          </g>
+          
+          <!-- Mountains -->
+          <path d="M0,150 L60,90 L100,130 L160,70 L200,150 Z" fill="#6B8E23" />
+          
+          <!-- Trees -->
+          <g>
+            <rect x="30" y="120" width="5" height="15" fill="#8B4513" />
+            <polygon points="20,120 45,120 32.5,90" fill="#228B22">
+              <animate attributeName="points" values="20,120 45,120 32.5,90;18,120 47,120 32.5,90;20,120 45,120 32.5,90" dur="2s" repeatCount="indefinite" />
+            </polygon>
+          </g>
+          
+          <g>
+            <rect x="170" y="130" width="5" height="15" fill="#8B4513" />
+            <polygon points="160,130 185,130 172.5,100" fill="#228B22">
+              <animate attributeName="points" values="160,130 185,130 172.5,100;158,130 187,130 172.5,100;160,130 185,130 172.5,100" dur="2.5s" repeatCount="indefinite" />
+            </polygon>
+          </g>
+          
+          <!-- Flowers -->
+          <g>
+            <circle cx="60" cy="140" r="3" fill="#FF69B4" />
+            <circle cx="65" cy="143" r="3" fill="#FF1493" />
+            <circle cx="55" cy="143" r="3" fill="#FF69B4" />
+            <circle cx="60" cy="146" r="3" fill="#FF1493" />
+          </g>
+          
+          <g>
+            <circle cx="120" cy="145" r="3" fill="#FF69B4" />
+            <circle cx="125" cy="148" r="3" fill="#FF1493" />
+            <circle cx="115" cy="148" r="3" fill="#FF69B4" />
+            <circle cx="120" cy="151" r="3" fill="#FF1493" />
+          </g>
+          
+          <!-- Birds -->
+          <path d="M80,50 Q85,45 90,50 Q95,45 100,50" fill="none" stroke="#000" stroke-width="1">
+            <animate attributeName="d" values="M80,50 Q85,45 90,50 Q95,45 100,50;M80,48 Q85,43 90,48 Q95,43 100,48;M80,50 Q85,45 90,50 Q95,45 100,50" dur="1s" repeatCount="indefinite" />
+          </path>
+          
+          <path d="M110,40 Q115,35 120,40 Q125,35 130,40" fill="none" stroke="#000" stroke-width="1">
+            <animate attributeName="d" values="M110,40 Q115,35 120,40 Q125,35 130,40;M110,38 Q115,33 120,38 Q125,33 130,38;M110,40 Q115,35 120,40 Q125,35 130,40" dur="1.2s" repeatCount="indefinite" />
+          </path>
+          
+          <!-- Clouds -->
+          <g>
+            <ellipse cx="50" cy="30" rx="20" ry="10" fill="white" opacity="0.8">
+              <animate attributeName="cx" values="50;55;50" dur="5s" repeatCount="indefinite" />
+            </ellipse>
+            <ellipse cx="40" cy="25" rx="15" ry="8" fill="white" opacity="0.9">
+              <animate attributeName="cx" values="40;45;40" dur="5s" repeatCount="indefinite" />
+            </ellipse>
+            <ellipse cx="60" cy="25" rx="15" ry="8" fill="white" opacity="0.9">
+              <animate attributeName="cx" values="60;65;60" dur="5s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </svg>
+      </div>
+      <p class="click-instruction">Click to open</p>
+    </div>
+    <div class="card-inside">
+      <h2 class="card-title" style="color: #444;">Embracing Joy</h2>
+      <div class="image-container">
+        <svg class="svg-image" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background with gradient -->
+          <defs>
+            <linearGradient id="partyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffafbd" />
+              <stop offset="100%" stop-color="#ffc3a0" />
+            </linearGradient>
+          </defs>
+          <rect width="200" height="200" fill="url(#partyGradient)" />
+          
+          <!-- Party elements -->
+          <!-- Balloons -->
+          <g>
+            <path d="M50,100 C50,70 30,70 30,40 C30,20 50,10 70,30 C90,10 110,20 110,40 C110,70 90,70 90,100 Z" fill="#FF5252">
+              <animate attributeName="d" values="M50,100 C50,70 30,70 30,40 C30,20 50,10 70,30 C90,10 110,20 110,40 C110,70 90,70 90,100 Z;M50,105 C50,75 30,75 30,45 C30,25 50,15 70,35 C90,15 110,25 110,45 C110,75 90,75 90,105 Z;M50,100 C50,70 30,70 30,40 C30,20 50,10 70,30 C90,10 110,20 110,40 C110,70 90,70 90,100 Z" dur="3s" repeatCount="indefinite" />
+            </path>
+            <line x1="70" y1="100" x2="70" y2="150" stroke="#444" stroke-width="2" />
+          </g>
+          
+          <!-- Gift box -->
+          <g>
+            <rect x="120" y="130" width="50" height="40" fill="#6200EA" />
+            <rect x="120" y="125" width="50" height="10" fill="#9D46FF" />
+            <rect x1="145" y1="125" x2="145" y2="170" stroke="#FFD54F" stroke-width="4" />
+            <path d="M140,125 Q145,110 150,125" stroke="#FFD54F" fill="transparent" stroke-width="4" />
+            <path d="M150,125 Q145,100 140,125" stroke="#FFD54F" fill="transparent" stroke-width="4" />
+          </g>
+          
+          <!-- Confetti -->
+          <g>
+            <rect x="30" y="30" width="5" height="5" fill="#FFC107">
+              <animate attributeName="y" values="30;200;30" dur="7s" repeatCount="indefinite" />
+              <animate attributeName="x" values="30;25;30" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="2s" repeatCount="indefinite" />
+            </rect>
+            <rect x="60" y="20" width="4" height="4" fill="#F44336">
+              <animate attributeName="y" values="20;200;20" dur="5s" repeatCount="indefinite" />
+              <animate attributeName="x" values="60;65;60" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="3s" repeatCount="indefinite" />
+            </rect>
+            <rect x="100" y="30" width="6" height="3" fill="#4CAF50">
+              <animate attributeName="y" values="30;200;30" dur="6s" repeatCount="indefinite" />
+              <animate attributeName="x" values="100;95;100" dur="2.5s" repeatCount="indefinite" />
+              <animate attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="2.5s" repeatCount="indefinite" />
+            </rect>
+            <rect x="160" y="40" width="5" height="5" fill="#2196F3">
+              <animate attributeName="y" values="40;200;40" dur="8s" repeatCount="indefinite" />
+              <animate attributeName="x" values="160;165;160" dur="4s" repeatCount="indefinite" />
+              <animate attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="4s" repeatCount="indefinite" />
+            </rect>
+          </g>
+          
+          <!-- Party hat -->
+          <g>
+            <path d="M50,170 L70,120 L90,170 Z" fill="#FF9800" />
+            <line x1="50" y1="170" x2="90" y2="170" stroke="#E65100" stroke-width="3" />
+            <circle cx="70" cy="110" r="5" fill="#FFEB3B" />
+            <line x1="70" y1="115" x2="70" y2="105" stroke="#FFEB3B" stroke-width="2" />
+            <line x1="65" y1="110" x2="75" y2="110" stroke="#FFEB3B" stroke-width="2" />
+          </g>
+          
+          <!-- Stars -->
+          <g>
+            <path d="M140,50 L145,40 L150,50 L160,55 L150,60 L145,70 L140,60 L130,55 Z" fill="#FFEB3B">
+              <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite" />
+            </path>
+            <path d="M170,90 L175,80 L180,90 L190,95 L180,100 L175,110 L170,100 L160,95 Z" fill="#FFEB3B">
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+            </path>
+          </g>
+        </svg>
+      </div>
+      <p class="card-message">Life is a beautiful journey filled with wonders and possibilities. May you always find reasons to smile and moments to cherish.</p>
+    </div>
+  </div>
+
+  <script>
+    const card = document.getElementById('card');
+    card.addEventListener('click', () => {
+      card.classList.toggle('opened');
+      if (card.classList.contains('opened')) {
+        createConfettiExplosion();
+      }
+    });
+    
+    // Create stars
+    function createStars() {
+      for (let i = 0; i < 20; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        const size = Math.random() * 8 + 4;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animation = `twinkle ${Math.random() * 2 + 1}s infinite`;
+        document.querySelector('.card-front').appendChild(star);
+      }
+    }
+    
+    // Create butterflies
+    function createButterflies() {
+      for (let i = 0; i < 3; i++) {
+        const butterfly = document.createElement('div');
+        butterfly.classList.add('butterfly');
+        butterfly.style.left = `${Math.random() * 80}%`;
+        butterfly.style.top = `${Math.random() * 80}%`;
+        butterfly.style.animation = `float ${Math.random() * 3 + 3}s infinite ease-in-out`;
+        document.querySelector('.card-inside').appendChild(butterfly);
+      }
+    }
+    
+    // Create balloons
+    function createBalloons() {
+      const colors = ['#ff5252', '#4caf50', '#2196f3', '#ff9800', '#9c27b0'];
+      for (let i = 0; i < 5; i++) {
+        const balloon = document.createElement('div');
+        balloon.classList.add('balloon');
+        balloon.style.left = `${i * 20 + 10}%`;
+        balloon.style.bottom = `${Math.random() * 20}%`;
+        balloon.style.backgroundColor = colors[i];
+        balloon.style.animationDelay = `${i * 0.5}s`;
+        document.querySelector('.card-inside').appendChild(balloon);
+      }
+    }
+    
+    // Create clouds
+    function createClouds() {
+      for (let i = 0; i < 3; i++) {
+        const cloud = document.createElement('div');
+        cloud.classList.add('cloud');
+        cloud.style.top = `${i * 25 + 10}%`;
+        cloud.style.animationDelay = `${i * 2}s`;
+        document.querySelector('.card-front').appendChild(cloud);
+      }
+    }
+    
+    // Create confetti explosion
+    function createConfettiExplosion() {
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+      
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.classList.add('confetti');
+          confetti.style.left = `${Math.random() * 300}px`;
+          confetti.style.top = '0';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s forwards`;
+          document.querySelector('.card').appendChild(confetti);
+          
+          // Remove confetti after animation
+          setTimeout(() => {
+            confetti.remove();
+          }, 5000);
+        }, Math.random() * 500);
+      }
+    }
+    
+    // Initialize animations
+    createStars();
+    createButterflies();
+    createBalloons();
+    createClouds();
+  </script>
+</body>
+</html>
